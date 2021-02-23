@@ -9,11 +9,14 @@ type ConstantDelaySchedule struct {
 }
 
 // Every returns a crontab Schedule that activates once every duration.
-// Delays of less than a second are not supported (will round up to 1 second).
-// Any fields less than a Second are truncated.
+// Delays of less than a millisecond are not supported (will round up to 1 millisecond).
+// Any fields less than a millisecond are truncated.
 func Every(duration time.Duration) ConstantDelaySchedule {
+	if duration < time.Millisecond {
+		duration = time.Millisecond
+	}
 	return ConstantDelaySchedule{
-		Delay: duration - time.Duration(duration.Nanoseconds()),
+		Delay: duration - time.Duration(duration.Nanoseconds())%time.Millisecond,
 	}
 }
 
